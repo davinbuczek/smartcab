@@ -12,7 +12,9 @@ class LearningAgent(Agent):
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
         self.actions = ['forward', 'left', 'right', None]
-        
+        self.next_waypoint = None
+        self.total_reward = 0	
+        self.state = 0
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
@@ -25,6 +27,7 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
+        self.state = (inputs['light'], inputs['oncoming'], inputs['left'], inputs['right'], self.next_waypoint)
         
         # TODO: Select action according to your policy
         action = random.choice(self.actions)
@@ -36,6 +39,8 @@ class LearningAgent(Agent):
 
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
+	def return_state(self):
+		return self.state
 
 def run():
     """Run the agent for a finite number of trials."""
