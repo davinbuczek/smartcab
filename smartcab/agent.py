@@ -15,9 +15,10 @@ class LearningAgent(Agent):
         self.trial = 0
         self.steps = 0
         self.deadline = 0
-        self.alpha = 0.5
-        self.gamma = 0.2
-        self.data_list = [["Trial", "Status", "Deadline", "Steps"]] # lists of lists for capturing data from trial rums for performance tuning
+        self.penalties = 0
+        self.alpha = 0.81
+        self.gamma = 0.21
+        self.data_list = [["Trial", "Status", "Deadline", "Steps", "Penalties"]] # lists of lists for capturing data from trial rums for performance tuning
         self.valid_waypoints = ['left','forward','right'] # list of valid directions based on suggested waypoint
         self.valid_lights = ['red', 'green'] # list of valid traffic light states
         self.valid_actions = [None, 'forward', 'left', 'right'] # list of valid actions the smartcab can take
@@ -32,10 +33,11 @@ class LearningAgent(Agent):
         # TODO: Prepare for a new trip; reset any variables here, if required
         self.deadline = self.env.agent_states[self.env.primary_agent]['deadline']
         self.steps = 0
+        self.penalties = 0
         self.trial += 1
         
     def summary(self, status):
-        self.data_list.append([self.trial, status, self.deadline, self.steps])
+        self.data_list.append([self.trial, status, self.deadline, self.steps, self.penalties])
 
         if self.trial == 100: # once test complete write data_list struct to csv file
             filename = "alpha{}_gamma{}.csv".format(self.alpha, self.gamma)
@@ -61,7 +63,8 @@ class LearningAgent(Agent):
 
         # Execute action and get reward
         reward = self.env.act(self, action)
-		
+        if reward < 0.0:
+            self.penalties +=1
         # TODO: Learn policy based on state, action, reward
 
         inputs = self.env.sense(self)
